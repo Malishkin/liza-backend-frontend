@@ -1,3 +1,72 @@
+/* Убедитесь, что стили специфичны для контактной формы */
+.contact-container form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  margin: auto;
+}
+
+.contact-container h2 {
+  margin-bottom: 20px;
+}
+
+.contact-container input,
+.contact-container textarea {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.contact-container button {
+  padding: 10px 20px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.contact-container button:hover {
+  background: #0056b3;
+}
+
+.contact-container .error {
+  color: red;
+  margin-top: 10px;
+}
+
+/* Стили для модального окна */
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+/* Оставляем остальные стили как есть */
 .contact-container {
   max-width: 600px;
   margin: 50px auto;
@@ -9,7 +78,7 @@
   background-color: #f9f9f9;
 }
 
-h2 {
+.contact-title {
   margin-bottom: 20px;
 }
 
@@ -73,28 +142,4 @@ button:hover {
   margin-bottom: 15px;
   color: green;
   font-weight: bold;
-}
-
-.modal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  right: auto;
-  bottom: auto;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  text-align: center;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
 }

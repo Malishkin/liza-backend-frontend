@@ -30,7 +30,9 @@ const Admin = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/items");
+      const response = await axios.get("http://localhost:5000/api/items", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setItems(response.data);
     } catch (error) {
       console.error("Error fetching items:", error);
@@ -39,7 +41,9 @@ const Admin = () => {
 
   const fetchAboutContent = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/about");
+      const response = await axios.get("http://localhost:5000/api/about", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       if (response.data) {
         setAboutContent(response.data.content);
         setAboutImage(response.data.image);
@@ -74,6 +78,7 @@ const Admin = () => {
           {
             headers: {
               "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
         );
@@ -82,6 +87,7 @@ const Admin = () => {
         await axios.post("http://localhost:5000/api/items", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
       }
@@ -105,7 +111,9 @@ const Admin = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/items/${deleteItemId}`);
+      await axios.delete(`http://localhost:5000/api/items/${deleteItemId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       fetchItems();
       setShowConfirm(false); // Close confirmation dialog
     } catch (error) {
@@ -140,6 +148,7 @@ const Admin = () => {
       await axios.put("http://localhost:5000/api/about", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       alert("About content updated successfully!");
