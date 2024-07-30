@@ -1,35 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./About.css";
-import aboutImage from "../images/11.png"; // Ensure the path to your image is correct
 
 const About = () => {
+  const [aboutContent, setAboutContent] = useState("");
+  const [aboutImage, setAboutImage] = useState("");
+
+  useEffect(() => {
+    const fetchAboutContent = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/about");
+        if (response.data) {
+          setAboutContent(response.data.content);
+          setAboutImage(response.data.image);
+        }
+      } catch (error) {
+        console.error("Error fetching about content:", error);
+      }
+    };
+
+    fetchAboutContent();
+  }, []);
+
   return (
     <div className="about-container">
       <div className="about-text">
-        <p>
-          El Messeg is a stylist and creative consultant with vast experience in
-          the fashion industry spanning over the past decade.
-        </p>
-        <p>
-          As an early adapter of social media, Liza has throughout the years
-          obtained a deep understanding of content creation, social engagement,
-          and branding strategies throughout the years.
-        </p>
-        <p>
-          Liza’s aesthetic is both personally and professionally recognizable
-          for the well-thought-through balance between classic Scandinavian
-          minimalism and eye-catching twists. This cross-over enables her to
-          have a good understanding of both the Scandinavian and the
-          international markets.
-        </p>
-        <h3>Services</h3>
-        <ul>
-          <li>Styling</li>
-          <li>Creative Consulting</li>
-        </ul>
+        <div dangerouslySetInnerHTML={{ __html: aboutContent }} />
+        <p>Services Styling Creative Consulting</p>
       </div>
       <div className="about-image">
-        <img src={aboutImage} alt="El Messeg" />
+        {aboutImage && (
+          <img src={`http://localhost:5000/${aboutImage}`} alt="El Messeg" />
+        )}
       </div>
     </div>
   );

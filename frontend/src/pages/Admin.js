@@ -13,9 +13,13 @@ const Admin = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const confirmDialogRef = useRef(null); // Use ref to access confirm dialog
+  const [aboutContent, setAboutContent] = useState(""); // State for About content
+  const [aboutImage, setAboutImage] = useState(null); // State for About image
+  const aboutImageRef = useRef(null); // Use ref to access About image input
 
   useEffect(() => {
     fetchItems();
+    fetchAboutContent();
   }, []);
 
   useEffect(() => {
@@ -30,6 +34,18 @@ const Admin = () => {
       setItems(response.data);
     } catch (error) {
       console.error("Error fetching items:", error);
+    }
+  };
+
+  const fetchAboutContent = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/about");
+      if (response.data) {
+        setAboutContent(response.data.content);
+        setAboutImage(response.data.image);
+      }
+    } catch (error) {
+      console.error("Error fetching about content:", error);
     }
   };
 
@@ -114,6 +130,25 @@ const Admin = () => {
     fileInputRef.current.value = ""; // Clear file input
   };
 
+  const handleAboutSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("content", aboutContent);
+    if (aboutImage) formData.append("image", aboutImage);
+
+    try {
+      await axios.put("http://localhost:5000/api/about", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert("About content updated successfully!");
+      fetchAboutContent(); // Refresh about content
+    } catch (error) {
+      console.error("Error updating about content:", error);
+    }
+  };
+
   return (
     <div className="admin-container">
       <h2>Admin Panel</h2>
@@ -190,6 +225,38 @@ const Admin = () => {
           <button onClick={handleCancelDelete}>Cancel</button>
         </div>
       )}
+      <div className="about-edit">
+        <h3>Edit About Page</h3>
+        <form onSubmit={handleAboutSubmit}>
+          <textarea
+            value={aboutContent}
+            onChange={(e) => setAboutContent(e.target.value)}
+            rows="10"
+            cols="50"
+          ></textarea>
+          <input
+            type="file"
+            onChange={(e) => setAboutImage(e.target.files[0])}
+            ref={aboutImageRef}
+          />
+          {aboutImage && <p>Selected Image: {aboutImage.name}</p>}
+          <button type="submit">Update About</button>
+        </form>
+        {aboutImage && (
+          <div className="about-preview">
+            <h4>Current Image:</h4>
+            <img
+              src={`http://localhost:5000/${aboutImage}`}
+              alt="About"
+              style={{
+                maxWidth: "200px",
+                maxHeight: "200px",
+                margin: "10px",
+              }}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

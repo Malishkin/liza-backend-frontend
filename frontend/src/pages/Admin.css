@@ -49,3 +49,42 @@
 .confirm-dialog button {
   margin-right: 10px;
 }
+
+.about-edit {
+  margin-top: 20px;
+}
+
+.about-edit textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.about-edit button {
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.about-edit button:hover {
+  background-color: #0056b3;
+}
+
+.about-edit input[type="file"] {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.about-preview {
+  margin-top: 10px;
+}
+
+.about-preview img {
+  display: block;
+}

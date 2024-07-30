@@ -35,6 +35,14 @@ const itemSchema = new mongoose.Schema({
 
 const Item = mongoose.model("Item", itemSchema);
 
+// Схема для страницы "About"
+const aboutSchema = new mongoose.Schema({
+  content: String,
+  image: String,
+});
+
+const About = mongoose.model("About", aboutSchema);
+
 // Настройка хранилища для multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -104,6 +112,41 @@ app.delete("/api/items/:id", async (req, res) => {
   try {
     const item = await Item.findByIdAndDelete(req.params.id);
     res.json(item);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Получить содержимое страницы "About"
+app.get("/api/about", async (req, res) => {
+  try {
+    const about = await About.findOne();
+    res.json(about);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Обновить содержимое страницы "About"
+app.put("/api/about", upload.single("image"), async (req, res) => {
+  try {
+    const { content } = req.body;
+    const image = req.file
+      ? `uploads/${req.file.filename.replace(/\\/g, "/")}`
+      : undefined;
+
+    let about = await About.findOne();
+    if (about) {
+      about.content = content;
+      if (image) {
+        about.image = image;
+      }
+    } else {
+      about = new About({ content, image });
+    }
+
+    const updatedAbout = await about.save();
+    res.json(updatedAbout);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

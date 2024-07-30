@@ -16,12 +16,6 @@
   text-align: center;
 }
 
-.work-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
-
 .work-gallery img {
   width: 100%;
   height: auto;
@@ -51,9 +45,5 @@
   .work-category {
     width: 30%;
     margin-bottom: 0;
-  }
-
-  .work-gallery {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
