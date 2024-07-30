@@ -25,8 +25,9 @@ const About = () => {
   return (
     <div className="about-container">
       <div className="about-text">
-        <div dangerouslySetInnerHTML={{ __html: aboutContent }} />
-        <p>Services Styling Creative Consulting</p>
+        {aboutContent.split("\n").map((paragraph, index) => (
+          <p key={index}>{paragraph}</p>
+        ))}
       </div>
       <div className="about-image">
         {aboutImage && (

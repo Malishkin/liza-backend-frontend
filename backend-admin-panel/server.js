@@ -35,10 +35,10 @@ const itemSchema = new mongoose.Schema({
 
 const Item = mongoose.model("Item", itemSchema);
 
-// Схема для страницы "About"
+// Схема для страницы About
 const aboutSchema = new mongoose.Schema({
   content: String,
-  image: String,
+  image: String, // Путь к изображению
 });
 
 const About = mongoose.model("About", aboutSchema);
@@ -117,36 +117,29 @@ app.delete("/api/items/:id", async (req, res) => {
   }
 });
 
-// Получить содержимое страницы "About"
+// Получить контент для страницы About
 app.get("/api/about", async (req, res) => {
   try {
-    const about = await About.findOne();
-    res.json(about);
+    const aboutContent = await About.findOne();
+    res.json(aboutContent);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Обновить содержимое страницы "About"
+// Обновить контент страницы About
 app.put("/api/about", upload.single("image"), async (req, res) => {
   try {
-    const { content } = req.body;
-    const image = req.file
-      ? `uploads/${req.file.filename.replace(/\\/g, "/")}`
-      : undefined;
+    const updateData = {
+      content: req.body.content,
+      ...(req.file && { image: `uploads/${req.file.filename}` }),
+    };
 
-    let about = await About.findOne();
-    if (about) {
-      about.content = content;
-      if (image) {
-        about.image = image;
-      }
-    } else {
-      about = new About({ content, image });
-    }
-
-    const updatedAbout = await about.save();
-    res.json(updatedAbout);
+    const aboutContent = await About.findOneAndUpdate({}, updateData, {
+      new: true,
+      upsert: true,
+    });
+    res.json(aboutContent);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
