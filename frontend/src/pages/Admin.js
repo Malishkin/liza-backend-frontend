@@ -219,10 +219,13 @@ const Admin = () => {
                   }}
                 />
               ))}
+              <div className="buttons-display">
               <button onClick={() => handleEdit(item)}>Edit</button>
               <button onClick={() => showDeleteConfirm(item._id)}>
                 Delete
               </button>
+              </div>
+             
             </li>
           ))}
         </ul>
