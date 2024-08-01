@@ -17,14 +17,12 @@ app.use(bodyParser.json());
 
 // Подключение к MongoDB
 const mongoURI = process.env.MONGO_URI;
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
-const conn = mongoose.connection;
-
-conn.once("open", () => {
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
   console.log("MongoDB connected");
-});
-
-conn.on("error", (err) => {
+}).catch((err) => {
   console.error("MongoDB connection error:", err);
 });
 
