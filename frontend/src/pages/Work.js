@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";  // Убедитесь, что путь правильный
 import "./Work.css";
 
 const Work = () => {
@@ -11,7 +11,7 @@ const Work = () => {
 
   const fetchWorkData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/items");
+      const response = await axios.get("/api/items");
       setWorkData(response.data);
     } catch (error) {
       console.error("Error fetching work data:", error);
@@ -27,7 +27,7 @@ const Work = () => {
               {categoryData.images.map((image, idx) => (
                 <div className="work-item" key={idx}>
                   <img
-                    src={`http://localhost:5000/${image}`}
+                    src={`${axios.defaults.baseURL}/${image}`}
                     alt={`Work ${idx + 1}`}
                   />
                   {image === categoryData.shortImage && (

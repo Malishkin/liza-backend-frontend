@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../axiosConfig"; // Убедитесь, что путь правильный
 import "./About.css";
 
 const About = () => {
@@ -9,7 +9,7 @@ const About = () => {
   useEffect(() => {
     const fetchAboutContent = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/about");
+        const response = await axios.get("/api/about");
         if (response.data) {
           setAboutContent(response.data.content);
           setAboutImage(response.data.image);
@@ -31,7 +31,10 @@ const About = () => {
       </div>
       <div className="about-image">
         {aboutImage && (
-          <img src={`http://localhost:5000/${aboutImage}`} alt="El Messeg" />
+          <img
+            src={`${axios.defaults.baseURL}/${aboutImage}`}
+            alt="El Messeg"
+          />
         )}
       </div>
     </div>

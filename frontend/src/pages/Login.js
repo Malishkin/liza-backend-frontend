@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig"; // Убедитесь, что вы используете правильный путь
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
@@ -7,12 +7,13 @@ const Login = ({ setAuth }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate(); // Используем useNavigate для навигации
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Attempting to log in with:", { username, password });
     try {
-      const response = await axios.post("http://localhost:5000/api/login", {
+      const response = await axios.post("/api/login", {
         username,
         password,
       });
@@ -29,6 +30,10 @@ const Login = ({ setAuth }) => {
       }
     } catch (error) {
       setError("Error logging in. Please try again.");
+      console.error(
+        "Error logging in:",
+        error.response ? error.response.data : error.message
+      );
     }
   };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import axios from "../axiosConfig"; // Убедитесь, что путь правильный
 import "./Admin.css";
 
 const Admin = () => {
@@ -30,7 +30,7 @@ const Admin = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/items", {
+      const response = await axios.get("/api/items", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setItems(response.data);
@@ -41,7 +41,7 @@ const Admin = () => {
 
   const fetchAboutContent = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/about", {
+      const response = await axios.get("/api/about", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (response.data) {
@@ -72,19 +72,15 @@ const Admin = () => {
 
     try {
       if (editItem) {
-        await axios.put(
-          `http://localhost:5000/api/items/${editItem._id}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        await axios.put(`/api/items/${editItem._id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         setEditItem(null);
       } else {
-        await axios.post("http://localhost:5000/api/items", formData, {
+        await axios.post("/api/items", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -111,7 +107,7 @@ const Admin = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/items/${deleteItemId}`, {
+      await axios.delete(`/api/items/${deleteItemId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchItems();
@@ -145,7 +141,7 @@ const Admin = () => {
     if (aboutImage) formData.append("image", aboutImage);
 
     try {
-      await axios.put("http://localhost:5000/api/about", formData, {
+      await axios.put("/api/about", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -210,7 +206,7 @@ const Admin = () => {
               {item.images.map((image, index) => (
                 <img
                   key={index}
-                  src={`http://localhost:5000/${image}`}
+                  src={`${axios.defaults.baseURL}/${image}`}
                   alt="Work"
                   style={{
                     maxWidth: "100px",
@@ -220,12 +216,11 @@ const Admin = () => {
                 />
               ))}
               <div className="buttons-display">
-              <button onClick={() => handleEdit(item)}>Edit</button>
-              <button onClick={() => showDeleteConfirm(item._id)}>
-                Delete
-              </button>
+                <button onClick={() => handleEdit(item)}>Edit</button>
+                <button onClick={() => showDeleteConfirm(item._id)}>
+                  Delete
+                </button>
               </div>
-             
             </li>
           ))}
         </ul>
@@ -258,7 +253,7 @@ const Admin = () => {
           <div className="about-preview">
             <h4>Current Image:</h4>
             <img
-              src={`http://localhost:5000/${aboutImage}`}
+              src={`${axios.defaults.baseURL}/${aboutImage}`}
               alt="About"
               style={{
                 maxWidth: "200px",
