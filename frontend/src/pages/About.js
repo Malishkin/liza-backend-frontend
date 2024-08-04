@@ -32,7 +32,7 @@ const About = () => {
       <div className="about-image">
         {aboutImage && (
           <img
-            src={`${axios.defaults.baseURL}/${aboutImage}`}
+            src={`${axios.defaults.baseURL.replace("/api", "")}/${aboutImage}`}
             alt="El Messeg"
           />
         )}
