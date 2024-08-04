@@ -6,7 +6,14 @@ const multer = require("multer");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+const dotenv = require("dotenv");
+
+// Загрузка переменных окружения в зависимости от режима (development или production)
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: ".env.development" });
+} else {
+  dotenv.config({ path: ".env.production" });
+}
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -17,14 +24,19 @@ app.use(bodyParser.json());
 
 // Подключение к MongoDB
 const mongoURI = process.env.MONGO_URI;
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log("MongoDB connected");
-}).catch((err) => {
-  console.error("MongoDB connection error:", err);
-});
+// console.log(process.env.MONGO_URI);
+
+mongoose
+  .connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
 
 // Схема для пользователя
 const userSchema = new mongoose.Schema({
@@ -133,7 +145,8 @@ app.post(
   async (req, res) => {
     try {
       const imagePaths = req.files.map(
-        (file) => `uploads/${file.filename.replace(/\\/g, "/")}`
+        (file) =>
+          `${process.env.API_URL}/uploads/${file.filename.replace(/\\/g, "/")}`
       );
       const shortImage = imagePaths[0];
 
@@ -159,7 +172,9 @@ app.put(
   async (req, res) => {
     try {
       const imagePaths = req.files.length
-        ? req.files.map((file) => `uploads/${file.filename}`)
+        ? req.files.map(
+            (file) => `${process.env.API_URL}/uploads/${file.filename}`
+          )
         : undefined;
       const shortImage = imagePaths ? imagePaths[0] : undefined;
 
@@ -207,7 +222,9 @@ app.put(
     try {
       const updateData = {
         content: req.body.content,
-        ...(req.file && { image: `uploads/${req.file.filename}` }),
+        ...(req.file && {
+          image: `${process.env.API_URL}/uploads/${req.file.filename}`,
+        }),
       };
 
       const aboutContent = await About.findOneAndUpdate({}, updateData, {

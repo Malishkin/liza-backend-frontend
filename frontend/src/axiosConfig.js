@@ -6,6 +6,5 @@ const baseURL =
     : process.env.REACT_APP_API_URL_LOCAL;
 
 axios.defaults.baseURL = baseURL;
-axios.defaults.headers.post["Content-Type"] = "application/json";
 
 export default axios;

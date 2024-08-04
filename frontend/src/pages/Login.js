@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "../axiosConfig"; // Убедитесь, что вы используете правильный путь
+import axios from "../axiosConfig"; // Импортируйте настроенный axios из вашего файла axiosConfig
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
@@ -11,29 +11,28 @@ const Login = ({ setAuth }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Attempting to log in with:", { username, password });
+    const data = { username, password };
+
     try {
-      const response = await axios.post("/api/login", {
-        username,
-        password,
+      const response = await axios.post("/api/login", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+
       if (response.data.success) {
         setAuth(true);
-        localStorage.setItem("token", response.data.token); // Save token to localStorage
+        localStorage.setItem("token", response.data.token);
         axios.defaults.headers.common[
           "Authorization"
         ] = `Bearer ${response.data.token}`;
         setError("");
-        navigate("/admin"); // Перенаправляем на страницу /admin
+        navigate("/admin");
       } else {
         setError("Invalid credentials");
       }
     } catch (error) {
       setError("Error logging in. Please try again.");
-      console.error(
-        "Error logging in:",
-        error.response ? error.response.data : error.message
-      );
     }
   };
 

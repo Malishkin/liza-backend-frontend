@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "../axiosConfig"; // Убедитесь, что путь правильный
+import axios from "../axiosConfig"; // Импортируйте настроенный axios из вашего файла axiosConfig
 import "./Admin.css";
 
 const Admin = () => {
@@ -7,15 +7,15 @@ const Admin = () => {
   const [category, setCategory] = useState("");
   const [files, setFiles] = useState([]);
   const [editItem, setEditItem] = useState(null);
-  const [error, setError] = useState(""); // State for error message
-  const fileInputRef = useRef(null); // Use ref to access file input
-  const formRef = useRef(null); // Use ref to access form container
+  const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
+  const formRef = useRef(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
-  const confirmDialogRef = useRef(null); // Use ref to access confirm dialog
-  const [aboutContent, setAboutContent] = useState(""); // State for About content
-  const [aboutImage, setAboutImage] = useState(null); // State for About image
-  const aboutImageRef = useRef(null); // Use ref to access About image input
+  const confirmDialogRef = useRef(null);
+  const [aboutContent, setAboutContent] = useState("");
+  const [aboutImage, setAboutImage] = useState(null);
+  const aboutImageRef = useRef(null);
 
   useEffect(() => {
     fetchItems();
@@ -89,8 +89,8 @@ const Admin = () => {
       }
       setCategory("");
       setFiles([]);
-      setError(""); // Clear error message
-      fileInputRef.current.value = ""; // Clear file input
+      setError("");
+      fileInputRef.current.value = "";
       fetchItems();
     } catch (error) {
       console.error("Error uploading files:", error);
@@ -101,8 +101,8 @@ const Admin = () => {
     setEditItem(item);
     setCategory(item.category);
     setFiles([]);
-    fileInputRef.current.value = ""; // Clear file input
-    formRef.current.scrollIntoView({ behavior: "smooth" }); // Scroll to form container
+    fileInputRef.current.value = "";
+    formRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleDelete = async () => {
@@ -111,15 +111,15 @@ const Admin = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchItems();
-      setShowConfirm(false); // Close confirmation dialog
+      setShowConfirm(false);
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   };
 
   const handleCancelDelete = () => {
-    setShowConfirm(false); // Close confirmation dialog
-    setDeleteItemId(null); // Clear delete item ID
+    setShowConfirm(false);
+    setDeleteItemId(null);
   };
 
   const showDeleteConfirm = (id) => {
@@ -131,7 +131,7 @@ const Admin = () => {
     setEditItem(null);
     setCategory("");
     setFiles([]);
-    fileInputRef.current.value = ""; // Clear file input
+    fileInputRef.current.value = "";
   };
 
   const handleAboutSubmit = async (e) => {
@@ -148,7 +148,7 @@ const Admin = () => {
         },
       });
       alert("About content updated successfully!");
-      fetchAboutContent(); // Refresh about content
+      fetchAboutContent();
     } catch (error) {
       console.error("Error updating about content:", error);
     }
@@ -175,11 +175,10 @@ const Admin = () => {
             type="file"
             multiple
             onChange={(e) => setFiles(Array.from(e.target.files))}
-            ref={fileInputRef} // Reference file input
+            ref={fileInputRef}
           />
         </div>
-        {error && <p className="error">{error}</p>}{" "}
-        {/* Display error message */}
+        {error && <p className="error">{error}</p>}
         <div>
           <button type="submit">{editItem ? "Update" : "Upload"}</button>
           {editItem && (

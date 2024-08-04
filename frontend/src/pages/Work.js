@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../axiosConfig";  // Убедитесь, что путь правильный
+import axios from "../axiosConfig"; // Убедитесь, что путь правильный
 import "./Work.css";
 
 const Work = () => {
