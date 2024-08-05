@@ -205,8 +205,8 @@ const Admin = () => {
               {item.images.map((image, index) => (
                 <img
                   key={index}
-                  src={`${axios.defaults.baseURL}/${image}`}
-                  alt="Work"
+                  src={`${axios.defaults.baseURL}${image}`}
+                  alt={`Work ${index + 1}`}
                   style={{
                     maxWidth: "100px",
                     maxHeight: "100px",
@@ -252,7 +252,7 @@ const Admin = () => {
           <div className="about-preview">
             <h4>Current Image:</h4>
             <img
-              src={`${axios.defaults.baseURL}/${aboutImage}`}
+              src={`${axios.defaults.baseURL}${aboutImage}`}
               alt="About"
               style={{
                 maxWidth: "200px",

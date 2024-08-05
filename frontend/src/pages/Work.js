@@ -27,10 +27,7 @@ const Work = () => {
               {categoryData.images.map((image, idx) => (
                 <div className="work-item" key={idx}>
                   <img
-                    src={`${axios.defaults.baseURL.replace(
-                      "/api",
-                      ""
-                    )}/${image}`}
+                    src={`${axios.defaults.baseURL}${image}`}
                     alt={`Work ${idx + 1}`}
                   />
                   {image === categoryData.shortImage && (

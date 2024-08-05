@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 
 // Подключение к MongoDB
 const mongoURI = process.env.MONGO_URI;
-// console.log(process.env.MONGO_URI);
+console.log(mongoURI);
 
 mongoose
   .connect(mongoURI, {
@@ -145,8 +145,7 @@ app.post(
   async (req, res) => {
     try {
       const imagePaths = req.files.map(
-        (file) =>
-          `${process.env.API_URL}/uploads/${file.filename.replace(/\\/g, "/")}`
+        (file) => `/uploads/${file.filename.replace(/\\/g, "/")}`
       );
       const shortImage = imagePaths[0];
 
@@ -172,9 +171,7 @@ app.put(
   async (req, res) => {
     try {
       const imagePaths = req.files.length
-        ? req.files.map(
-            (file) => `${process.env.API_URL}/uploads/${file.filename}`
-          )
+        ? req.files.map((file) => `/uploads/${file.filename}`)
         : undefined;
       const shortImage = imagePaths ? imagePaths[0] : undefined;
 
@@ -223,7 +220,7 @@ app.put(
       const updateData = {
         content: req.body.content,
         ...(req.file && {
-          image: `${process.env.API_URL}/uploads/${req.file.filename}`,
+          image: `/uploads/${req.file.filename}`,
         }),
       };
 
