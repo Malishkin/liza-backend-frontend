@@ -233,6 +233,17 @@ app.put(
   }
 );
 
+const fs = require("fs");
+
+app.get("/check-uploads", (req, res) => {
+  fs.readdir(path.join(__dirname, "uploads"), (err, files) => {
+    if (err) {
+      return res.status(500).send("Unable to scan directory: " + err);
+    }
+    res.json(files);
+  });
+});
+
 // Статическая папка для загрузок
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
