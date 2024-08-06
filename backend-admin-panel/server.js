@@ -8,14 +8,21 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
-dotenv.config();
+// Загрузка переменных окружения в зависимости от режима (development или production)
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: ".env.development" });
+} else {
+  dotenv.config({ path: ".env.production" });
+}
 
 const app = express();
 const port = process.env.PORT || 5000;
 
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
+// Подключение к MongoDB
 const mongoURI = process.env.MONGO_URI;
 
 mongoose
@@ -30,6 +37,7 @@ mongoose
     console.error("MongoDB connection error:", err);
   });
 
+// Схема для пользователя
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -37,21 +45,24 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
+// Схема для элемента с изображением
 const itemSchema = new mongoose.Schema({
   category: String,
-  images: [String],
+  images: [String], // Здесь будут храниться пути к изображениям
   shortImage: String,
 });
 
 const Item = mongoose.model("Item", itemSchema);
 
+// Схема для страницы About
 const aboutSchema = new mongoose.Schema({
   content: String,
-  image: String,
+  image: String, // Путь к изображению
 });
 
 const About = mongoose.model("About", aboutSchema);
 
+// Настройка хранилища для multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -63,6 +74,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Регистрация пользователя (один раз для создания аккаунта)
 app.post("/api/register", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -75,6 +87,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
+// Авторизация пользователя
 app.post("/api/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -99,6 +112,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+// Middleware для проверки аутентификации
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
@@ -113,6 +127,7 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
+// Получить все элементы (открытый маршрут)
 app.get("/api/items", async (req, res) => {
   try {
     const items = await Item.find();
@@ -122,6 +137,7 @@ app.get("/api/items", async (req, res) => {
   }
 });
 
+// Создать новый элемент (защищенный маршрут)
 app.post(
   "/api/items",
   authMiddleware,
@@ -147,6 +163,7 @@ app.post(
   }
 );
 
+// Обновить элемент (защищенный маршрут)
 app.put(
   "/api/items/:id",
   authMiddleware,
@@ -173,6 +190,7 @@ app.put(
   }
 );
 
+// Удалить элемент (защищенный маршрут)
 app.delete("/api/items/:id", authMiddleware, async (req, res) => {
   try {
     const item = await Item.findByIdAndDelete(req.params.id);
@@ -182,6 +200,7 @@ app.delete("/api/items/:id", authMiddleware, async (req, res) => {
   }
 });
 
+// Получить контент для страницы About (открытый маршрут)
 app.get("/api/about", async (req, res) => {
   try {
     const aboutContent = await About.findOne();
@@ -191,6 +210,7 @@ app.get("/api/about", async (req, res) => {
   }
 });
 
+// Обновить контент страницы About (защищенный маршрут)
 app.put(
   "/api/about",
   authMiddleware,
@@ -213,8 +233,10 @@ app.put(
   }
 );
 
+// Статическая папка для загрузок
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Запуск сервера
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
