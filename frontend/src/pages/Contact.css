@@ -143,3 +143,11 @@ button:hover {
   color: green;
   font-weight: bold;
 }
+
+@media screen and (max-width: 768px) {
+ 
+  .contact-container form {
+    padding: 3vw;
+    width: unset;
+  }
+}

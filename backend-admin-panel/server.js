@@ -24,7 +24,6 @@ app.use(bodyParser.json());
 
 // Подключение к MongoDB
 const mongoURI = process.env.MONGO_URI;
-console.log(mongoURI);
 
 mongoose
   .connect(mongoURI, {
@@ -219,9 +218,7 @@ app.put(
     try {
       const updateData = {
         content: req.body.content,
-        ...(req.file && {
-          image: `/uploads/${req.file.filename}`,
-        }),
+        ...(req.file && { image: `/uploads/${req.file.filename}` }),
       };
 
       const aboutContent = await About.findOneAndUpdate({}, updateData, {

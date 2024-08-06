@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "../axiosConfig"; // Импортируйте настроенный axios из вашего файла axiosConfig
+import axios from "../axiosConfig";
 import "./Admin.css";
 
 const Admin = () => {
