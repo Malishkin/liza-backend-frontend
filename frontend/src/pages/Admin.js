@@ -206,7 +206,7 @@ const Admin = () => {
                 <img
                   key={index}
                   src={`${axios.defaults.baseURL}${image}`}
-                  alt={`Work ${index + 1}`}
+                  alt="Work"
                   style={{
                     maxWidth: "100px",
                     maxHeight: "100px",
