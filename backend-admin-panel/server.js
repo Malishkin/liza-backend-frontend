@@ -52,6 +52,14 @@ if (!fs.existsSync(uploadDir)) {
   });
 }
 
+// Схема для пользователя
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
+const User = mongoose.model("User", userSchema);
+
 // Схема для элемента с изображением
 const itemSchema = new mongoose.Schema({
   category: String,
@@ -163,7 +171,6 @@ app.post(
       });
 
       const newItem = await item.save();
-      console.log("New item saved:", newItem);
       res.status(201).json(newItem);
     } catch (err) {
       console.error("Error uploading files:", err);
