@@ -163,6 +163,7 @@ app.post(
       });
 
       const newItem = await item.save();
+      console.log("New item saved:", newItem);
       res.status(201).json(newItem);
     } catch (err) {
       console.error("Error uploading files:", err);
