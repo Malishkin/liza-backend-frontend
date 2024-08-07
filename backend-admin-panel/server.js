@@ -7,6 +7,7 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const fs = require("fs");
 
 // Загрузка переменных окружения в зависимости от режима (development или production)
 if (process.env.NODE_ENV !== "production") {
@@ -37,13 +38,19 @@ mongoose
     console.error("MongoDB connection error:", err);
   });
 
-// Схема для пользователя
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-});
-
-const User = mongoose.model("User", userSchema);
+// Проверка прав доступа к директории
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+} else {
+  fs.access(uploadDir, fs.constants.W_OK, (err) => {
+    if (err) {
+      console.error(`No write access to uploads directory: ${err.message}`);
+    } else {
+      console.log("Write access to uploads directory confirmed.");
+    }
+  });
+}
 
 // Схема для элемента с изображением
 const itemSchema = new mongoose.Schema({
@@ -71,7 +78,6 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
-
 const upload = multer({ storage });
 
 // Регистрация пользователя (один раз для создания аккаунта)
@@ -137,13 +143,14 @@ app.get("/api/items", async (req, res) => {
   }
 });
 
-// Создать новый элемент (защищенный маршрут)
+// Сохранение новых элементов
 app.post(
   "/api/items",
   authMiddleware,
   upload.array("images", 10),
   async (req, res) => {
     try {
+      console.log("Files uploaded:", req.files);
       const imagePaths = req.files.map(
         (file) => `/uploads/${file.filename.replace(/\\/g, "/")}`
       );
@@ -158,18 +165,20 @@ app.post(
       const newItem = await item.save();
       res.status(201).json(newItem);
     } catch (err) {
+      console.error("Error uploading files:", err);
       res.status(400).json({ message: err.message });
     }
   }
 );
 
-// Обновить элемент (защищенный маршрут)
+// Обновление существующих элементов
 app.put(
   "/api/items/:id",
   authMiddleware,
   upload.array("images", 10),
   async (req, res) => {
     try {
+      console.log("Files uploaded:", req.files);
       const imagePaths = req.files.length
         ? req.files.map((file) => `/uploads/${file.filename}`)
         : undefined;
@@ -185,6 +194,7 @@ app.put(
       });
       res.json(item);
     } catch (err) {
+      console.error("Error updating item:", err);
       res.status(400).json({ message: err.message });
     }
   }
@@ -219,7 +229,9 @@ app.put(
     try {
       const updateData = {
         content: req.body.content,
-        ...(req.file && { image: `/uploads/${req.file.filename}` }),
+        ...(req.file && {
+          image: `/uploads/${req.file.filename}`,
+        }),
       };
 
       const aboutContent = await About.findOneAndUpdate({}, updateData, {
@@ -232,17 +244,6 @@ app.put(
     }
   }
 );
-
-const fs = require("fs");
-
-app.get("/check-uploads", (req, res) => {
-  fs.readdir(path.join(__dirname, "uploads"), (err, files) => {
-    if (err) {
-      return res.status(500).send("Unable to scan directory: " + err);
-    }
-    res.json(files);
-  });
-});
 
 // Статическая папка для загрузок
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
