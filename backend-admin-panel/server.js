@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const fs = require("fs");
+const AWS = require("aws-sdk"); // Добавлено для работы с S3
 
 // Загрузка переменных окружения в зависимости от режима (development или production)
 if (process.env.NODE_ENV !== "production") {
@@ -52,6 +53,37 @@ if (!fs.existsSync(uploadDir)) {
   });
 }
 
+// Настройка хранилища для multer (локальное сохранение)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+const upload = multer({ storage });
+
+// Настройка AWS S3
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+// Функция для загрузки файла в S3
+const uploadToS3 = (file) => {
+  const fileContent = fs.readFileSync(file.path);
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: file.filename,
+    Body: fileContent,
+    ContentType: file.mimetype,
+  };
+
+  return s3.upload(params).promise();
+};
+
 // Схема для пользователя
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
@@ -76,17 +108,6 @@ const aboutSchema = new mongoose.Schema({
 });
 
 const About = mongoose.model("About", aboutSchema);
-
-// Настройка хранилища для multer
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-const upload = multer({ storage });
 
 // Регистрация пользователя (один раз для создания аккаунта)
 app.post("/api/register", async (req, res) => {
@@ -151,7 +172,7 @@ app.get("/api/items", async (req, res) => {
   }
 });
 
-// Сохранение новых элементов
+// Сохранение новых элементов с сохранением в локальное хранилище и S3
 app.post(
   "/api/items",
   authMiddleware,
@@ -159,9 +180,17 @@ app.post(
   async (req, res) => {
     try {
       console.log("Files uploaded:", req.files);
+
+      // Сохранение локально
       const imagePaths = req.files.map(
         (file) => `/uploads/${file.filename.replace(/\\/g, "/")}`
       );
+
+      // Загрузка в S3
+      for (let file of req.files) {
+        await uploadToS3(file);
+      }
+
       const shortImage = imagePaths[0];
 
       const item = new Item({
@@ -179,7 +208,7 @@ app.post(
   }
 );
 
-// Обновление существующих элементов
+// Обновление существующих элементов с сохранением в локальное хранилище и S3
 app.put(
   "/api/items/:id",
   authMiddleware,
@@ -187,9 +216,17 @@ app.put(
   async (req, res) => {
     try {
       console.log("Files uploaded:", req.files);
+
+      // Сохранение локально
       const imagePaths = req.files.length
         ? req.files.map((file) => `/uploads/${file.filename}`)
         : undefined;
+
+      // Загрузка в S3
+      for (let file of req.files) {
+        await uploadToS3(file);
+      }
+
       const shortImage = imagePaths ? imagePaths[0] : undefined;
 
       const updateData = {
@@ -241,6 +278,11 @@ app.put(
           image: `/uploads/${req.file.filename}`,
         }),
       };
+
+      // Загрузка в S3
+      if (req.file) {
+        await uploadToS3(req.file);
+      }
 
       const aboutContent = await About.findOneAndUpdate({}, updateData, {
         new: true,
