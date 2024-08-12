@@ -4,6 +4,13 @@
   text-align: center;
 }
 
+.update-cancel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 10px;
+}
+
 .drop-zone {
   margin: 20px 0;
   padding: 20px;

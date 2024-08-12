@@ -179,7 +179,7 @@ const Admin = () => {
           />
         </div>
         {error && <p className="error">{error}</p>}
-        <div>
+        <div className="update-cancel">
           <button type="submit">{editItem ? "Update" : "Upload"}</button>
           {editItem && (
             <button type="button" onClick={handleCancel}>
@@ -227,8 +227,10 @@ const Admin = () => {
       {showConfirm && (
         <div className="confirm-dialog" ref={confirmDialogRef}>
           <p>Are you sure you want to delete this item?</p>
-          <button onClick={handleDelete}>Delete</button>
-          <button onClick={handleCancelDelete}>Cancel</button>
+          <div className="update-cancel">
+            <button onClick={handleDelete}>Delete</button>
+            <button onClick={handleCancelDelete}>Cancel</button>
+          </div>
         </div>
       )}
       <div className="about-edit">
