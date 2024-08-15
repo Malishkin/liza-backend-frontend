@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const fs = require("fs");
-const AWS = require("aws-sdk"); // Добавлено для работы с S3
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3"); // Обновлено для работы с S3 SDK v3
 
 // Загрузка переменных окружения в зависимости от режима (development или production)
 if (process.env.NODE_ENV !== "production") {
@@ -65,14 +65,16 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Настройка AWS S3
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+const s3 = new S3Client({
   region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
 // Функция для загрузки файла в S3
-const uploadToS3 = (file) => {
+const uploadToS3 = async (file) => {
   const fileContent = fs.readFileSync(file.path);
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME,
@@ -81,7 +83,13 @@ const uploadToS3 = (file) => {
     ContentType: file.mimetype,
   };
 
-  return s3.upload(params).promise();
+  try {
+    const command = new PutObjectCommand(params);
+    await s3.send(command);
+    console.log(`File uploaded successfully to S3: ${file.filename}`);
+  } catch (error) {
+    console.error(`Error uploading file to S3: ${error.message}`);
+  }
 };
 
 // Схема для пользователя
