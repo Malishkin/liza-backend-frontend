@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../axiosConfig"; // Убедитесь, что путь правильный
+import axios from "../axiosConfig";
 import "./Work.css";
 
 const Work = () => {
@@ -18,24 +18,27 @@ const Work = () => {
     }
   };
 
+  const handleImageLoad = (event) => {
+    event.target.parentNode.classList.add("loaded");
+  };
+
   return (
     <div className="work-container">
-      <div className="work-section">
+      <div className="work-gallery">
         {workData.map((categoryData, index) => (
           <div className="work-category" key={index}>
-            <div className="work-gallery">
-              {categoryData.images.map((image, idx) => (
-                <div className="work-item" key={idx}>
-                  <img
-                    src={`${axios.defaults.baseURL}${image}`}
-                    alt={`Work ${idx + 1}`}
-                  />
-                  {image === categoryData.shortImage && (
-                    <h2 className="category-title">{categoryData.category}</h2>
-                  )}
-                </div>
-              ))}
-            </div>
+            {categoryData.images.map((image, idx) => (
+              <div className="work-item" key={idx}>
+                <img
+                  src={`${axios.defaults.baseURL}${image}`}
+                  alt={`Work ${idx + 1}`}
+                  onLoad={handleImageLoad}
+                />
+                {image === categoryData.shortImage && (
+                  <h2 className="category-title">{categoryData.category}</h2>
+                )}
+              </div>
+            ))}
           </div>
         ))}
       </div>
