@@ -113,7 +113,6 @@ const Admin = () => {
 
   const handleMetaTagsSubmit = async (e) => {
     e.preventDefault();
-    console.log({ metaPage, metaTitle, metaDescription, metaKeywords });
     const formData = new FormData();
     formData.append("category", category);
     formData.append("metaTags[page]", metaPage); // Добавлено поле страницы
