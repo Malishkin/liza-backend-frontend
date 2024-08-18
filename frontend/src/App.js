@@ -7,6 +7,7 @@ import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { Helmet } from "react-helmet";
 import "./App.css";
 
 const App = () => {
@@ -14,6 +15,12 @@ const App = () => {
 
   return (
     <Router>
+      <Helmet>
+        <meta name="author" content="El Messeg Team" />
+        <meta property="og:type" content="website" />
+        <meta property="og:locale" content="en_US" />
+        <meta name="twitter:card" content="summary" />
+      </Helmet>
       <Layout>
         <Routes>
           <Route path="/" element={<Work />} />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "../axiosConfig"; // Убедитесь, что путь правильный
+import axios from "../axiosConfig";
+import { Helmet } from "react-helmet";
 import "./About.css";
 
 const About = () => {
@@ -24,6 +25,11 @@ const About = () => {
 
   return (
     <div className="about-container">
+      <Helmet>
+        <title>About Us | El Messeg</title>
+        <meta name="description" content="Learn more about El Messeg." />
+        <meta name="keywords" content="about, El Messeg, information" />
+      </Helmet>
       <div className="about-text">
         {aboutContent.split("\n").map((paragraph, index) => (
           <p key={index}>{paragraph}</p>

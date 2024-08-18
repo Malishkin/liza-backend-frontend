@@ -5,6 +5,10 @@ import "./Admin.css";
 const Admin = () => {
   const [items, setItems] = useState([]);
   const [category, setCategory] = useState("");
+  const [metaPage, setMetaPage] = useState(""); // Добавлено поле для выбора страницы
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [metaKeywords, setMetaKeywords] = useState("");
   const [files, setFiles] = useState([]);
   const [editItem, setEditItem] = useState(null);
   const [error, setError] = useState("");
@@ -61,14 +65,20 @@ const Admin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (files.length === 0) {
-      setError("Please select at least one file.");
+    const formData = new FormData();
+
+    if (files.length > 0) {
+      formData.append("category", category);
+      files.forEach((file) => formData.append("images", file));
+    } else if (!category && !metaTitle && !metaDescription && !metaKeywords) {
+      setError("Please fill out at least one field.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("category", category);
-    files.forEach((file) => formData.append("images", file));
+    formData.append("metaTags[page]", metaPage); // Добавлено поле страницы
+    formData.append("metaTags[title]", metaTitle);
+    formData.append("metaTags[description]", metaDescription);
+    formData.append("metaTags[keywords]", metaKeywords);
 
     try {
       if (editItem) {
@@ -88,18 +98,65 @@ const Admin = () => {
         });
       }
       setCategory("");
+      setMetaPage(""); // Сброс поля страницы
+      setMetaTitle("");
+      setMetaDescription("");
+      setMetaKeywords("");
       setFiles([]);
       setError("");
       fileInputRef.current.value = "";
-      fetchItems();
+      fetchItems(); // Обновляем список элементов после добавления/редактирования
     } catch (error) {
       console.error("Error uploading files:", error);
+    }
+  };
+
+  const handleMetaTagsSubmit = async (e) => {
+    e.preventDefault();
+    console.log({ metaPage, metaTitle, metaDescription, metaKeywords });
+    const formData = new FormData();
+    formData.append("category", category);
+    formData.append("metaTags[page]", metaPage); // Добавлено поле страницы
+    formData.append("metaTags[title]", metaTitle);
+    formData.append("metaTags[description]", metaDescription);
+    formData.append("metaTags[keywords]", metaKeywords);
+
+    try {
+      if (editItem) {
+        await axios.put(`/api/items/${editItem._id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setEditItem(null);
+      } else {
+        await axios.post("/api/items", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+      }
+      setCategory("");
+      setMetaPage(""); // Сброс поля страницы
+      setMetaTitle("");
+      setMetaDescription("");
+      setMetaKeywords("");
+      setError("");
+      fetchItems(); // Обновляем список элементов после добавления/редактирования
+    } catch (error) {
+      console.error("Error uploading meta tags:", error);
     }
   };
 
   const handleEdit = (item) => {
     setEditItem(item);
     setCategory(item.category);
+    setMetaPage(item.metaTags?.page || ""); // Устанавливаем страницу при редактировании
+    setMetaTitle(item.metaTags?.title || "");
+    setMetaDescription(item.metaTags?.description || "");
+    setMetaKeywords(item.metaTags?.keywords || "");
     setFiles([]);
     fileInputRef.current.value = "";
     formRef.current.scrollIntoView({ behavior: "smooth" });
@@ -110,7 +167,7 @@ const Admin = () => {
       await axios.delete(`/api/items/${deleteItemId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      fetchItems();
+      fetchItems(); // Обновляем список элементов после удаления
       setShowConfirm(false);
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -130,6 +187,10 @@ const Admin = () => {
   const handleCancel = () => {
     setEditItem(null);
     setCategory("");
+    setMetaPage(""); // Сброс поля страницы
+    setMetaTitle("");
+    setMetaDescription("");
+    setMetaKeywords("");
     setFiles([]);
     fileInputRef.current.value = "";
   };
@@ -165,6 +226,34 @@ const Admin = () => {
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         />
+        <input
+          type="text"
+          name="metaPage"
+          placeholder="Page (e.g., Work, About)"
+          value={metaPage}
+          onChange={(e) => setMetaPage(e.target.value)}
+        />
+        <input
+          type="text"
+          name="metaTitle"
+          placeholder="Meta Title"
+          value={metaTitle}
+          onChange={(e) => setMetaTitle(e.target.value)}
+        />
+        <input
+          type="text"
+          name="metaDescription"
+          placeholder="Meta Description"
+          value={metaDescription}
+          onChange={(e) => setMetaDescription(e.target.value)}
+        />
+        <input
+          type="text"
+          name="metaKeywords"
+          placeholder="Meta Keywords"
+          value={metaKeywords}
+          onChange={(e) => setMetaKeywords(e.target.value)}
+        />
         <div
           className="drop-zone"
           onDrop={handleDrop}
@@ -188,6 +277,52 @@ const Admin = () => {
           )}
         </div>
       </form>
+      <form ref={formRef} onSubmit={handleMetaTagsSubmit}>
+        <h3>Update Meta Tags Only</h3>
+        <input
+          type="text"
+          name="category"
+          placeholder="Category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
+        <input
+          type="text"
+          name="metaPage"
+          placeholder="Page (e.g., Work, About)"
+          value={metaPage}
+          onChange={(e) => setMetaPage(e.target.value)}
+        />
+        <input
+          type="text"
+          name="metaTitle"
+          placeholder="Meta Title"
+          value={metaTitle}
+          onChange={(e) => setMetaTitle(e.target.value)}
+        />
+        <input
+          type="text"
+          name="metaDescription"
+          placeholder="Meta Description"
+          value={metaDescription}
+          onChange={(e) => setMetaDescription(e.target.value)}
+        />
+        <input
+          type="text"
+          name="metaKeywords"
+          placeholder="Meta Keywords"
+          value={metaKeywords}
+          onChange={(e) => setMetaKeywords(e.target.value)}
+        />
+        <div className="update-cancel">
+          <button type="submit">Update Meta Tags</button>
+          {editItem && (
+            <button type="button" onClick={handleCancel}>
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
       <div className="files-list">
         <h3>Selected Files:</h3>
         <ul>
@@ -202,6 +337,11 @@ const Admin = () => {
           {items.map((item) => (
             <li key={item._id}>
               <h4>{item.category}</h4>
+              <p>Page: {item.metaTags?.page || "N/A"}</p>{" "}
+              {/* Показываем страницу метатегов */}
+              <p>Meta Title: {item.metaTags?.title || "N/A"}</p>
+              <p>Meta Description: {item.metaTags?.description || "N/A"}</p>
+              <p>Meta Keywords: {item.metaTags?.keywords || "N/A"}</p>
               {item.images.map((image, index) => (
                 <img
                   key={index}

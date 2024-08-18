@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "../axiosConfig";
+import { Helmet } from "react-helmet";
 import "./Work.css";
 
 const Work = () => {
@@ -24,6 +25,11 @@ const Work = () => {
 
   return (
     <div className="work-container">
+      <Helmet>
+        <title>Work | El Messeg</title>
+        <meta name="description" content="Explore our works and projects." />
+        <meta name="keywords" content="work, projects, portfolio" />
+      </Helmet>
       <div className="work-gallery">
         {workData.map((categoryData, index) => (
           <div className="work-category" key={index}>

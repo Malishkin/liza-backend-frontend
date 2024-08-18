@@ -105,6 +105,13 @@ const itemSchema = new mongoose.Schema({
   category: String,
   images: [String], // Здесь будут храниться пути к изображениям
   shortImage: String,
+  metaTags: {
+    // Новое поле для мета-тегов
+    page: String,
+    title: String,
+    description: String,
+    keywords: String,
+  },
 });
 
 const Item = mongoose.model("Item", itemSchema);
@@ -187,14 +194,12 @@ app.post(
   upload.array("images", 10),
   async (req, res) => {
     try {
-      console.log("Files uploaded:", req.files);
+      const { category, metaTags } = req.body; // Получение мета-тегов из тела запроса
 
-      // Сохранение локально
       const imagePaths = req.files.map(
         (file) => `/uploads/${file.filename.replace(/\\/g, "/")}`
       );
 
-      // Загрузка в S3
       for (let file of req.files) {
         await uploadToS3(file);
       }
@@ -202,9 +207,10 @@ app.post(
       const shortImage = imagePaths[0];
 
       const item = new Item({
-        category: req.body.category,
+        category,
         images: imagePaths,
-        shortImage: shortImage,
+        shortImage,
+        metaTags, // Сохранение мета-тегов
       });
 
       const newItem = await item.save();
@@ -223,14 +229,12 @@ app.put(
   upload.array("images", 10),
   async (req, res) => {
     try {
-      console.log("Files uploaded:", req.files);
+      const { category, metaTags } = req.body; // Получение мета-тегов из тела запроса
 
-      // Сохранение локально
       const imagePaths = req.files.length
         ? req.files.map((file) => `/uploads/${file.filename}`)
         : undefined;
 
-      // Загрузка в S3
       for (let file of req.files) {
         await uploadToS3(file);
       }
@@ -238,8 +242,9 @@ app.put(
       const shortImage = imagePaths ? imagePaths[0] : undefined;
 
       const updateData = {
-        category: req.body.category,
+        category,
         ...(imagePaths && { images: imagePaths, shortImage }),
+        metaTags, // Обновление мета-тегов
       };
 
       const item = await Item.findByIdAndUpdate(req.params.id, updateData, {
@@ -287,7 +292,6 @@ app.put(
         }),
       };
 
-      // Загрузка в S3
       if (req.file) {
         await uploadToS3(req.file);
       }
