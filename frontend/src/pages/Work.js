@@ -34,11 +34,11 @@ const Work = () => {
                   alt={`Work ${idx + 1}`}
                   onLoad={handleImageLoad}
                 />
-                {image === categoryData.shortImage && categoryData.category && (
-                  <div className="category-title">{categoryData.category}</div>
-                )}
               </div>
             ))}
+            {categoryData.shortImage && categoryData.category && (
+              <div className="category-title">{categoryData.category}</div>
+            )}
           </div>
         ))}
       </div>
